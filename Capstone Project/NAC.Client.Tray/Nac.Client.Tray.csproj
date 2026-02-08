@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\connected.ico" />
+    <None Remove="Resources\disconnected.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\connected.ico" />
+    <EmbeddedResource Include="Resources\disconnected.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NAC.Client.Core\NAC.Client.Core.csproj" />
+    <ProjectReference Include="..\NAC.Client.UI\NAC.Client.UI.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,189 @@
+﻿<Window
+    x:Class="NAC.Client.UI.LoginWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="320"
+    Height="300"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ShowInTaskbar="False"
+    WindowStartupLocation="Manual">
+
+    <Grid>
+        <Border
+            CornerRadius="18"
+            BorderBrush="#3B82F6"
+            BorderThickness="1"
+            Margin="12">
+
+            <Border.Background>
+                <ImageBrush
+                    ImageSource="pack://application:,,,/NAC.Client.UI;component/Assets/background1.png"
+                    Stretch="UniformToFill"/>
+            </Border.Background>
+
+            <Border 
+                Background="#140B1F33"
+                CornerRadius="18" 
+                Padding="20">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="14"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="22"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+                        <TextBlock
+                            Text="NAC"
+                            Foreground="White"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            HorizontalAlignment="Center"/>
+
+                        <Button
+                            Content="✕"
+                            Width="28"
+                            Height="28"
+                            FontSize="12"
+                            HorizontalAlignment="Right"
+                            Background="Transparent"
+                            Foreground="#60A5FA"
+                            BorderThickness="0"
+                            Click="Cancel_Click"/>
+                    </Grid>
+
+                    <Border
+                        Grid.Row="2"
+                        CornerRadius="12"
+                        BorderThickness="1"
+                        BorderBrush="#60A5FA"
+                        Background="#10000000">
+
+                        <Grid Height="42">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Text="👤"
+                                FontSize="14"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Foreground="#93C5FD"/>
+
+                            <TextBlock
+                                Text="Username"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Foreground="#80FFFFFF"
+                                FontSize="13"
+                                Margin="6,0,0,0"
+                                IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=UsernameBox}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <TextBox
+                                x:Name="UsernameBox"
+                                Grid.Column="1"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                FontSize="13"
+                                VerticalContentAlignment="Center"
+                                Padding="4,0"
+                                CaretBrush="White"/>
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        Grid.Row="4"
+                        CornerRadius="12"
+                        BorderThickness="1"
+                        BorderBrush="#60A5FA"
+                        Background="#10000000">
+
+                        <Grid Height="42">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Text="🔒"
+                                FontSize="14"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Foreground="#93C5FD"/>
+
+                            <TextBlock
+                                x:Name="PasswordPlaceholder"
+                                Text="Password"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Foreground="#80FFFFFF"
+                                FontSize="13"
+                                Margin="6,0,0,0"
+                                IsHitTestVisible="False"/>
+
+                            <PasswordBox
+                                x:Name="PasswordBox"
+                                Grid.Column="1"
+                                Background="Transparent"
+                                Foreground="White"
+                                BorderThickness="0"
+                                FontSize="13"
+                                Padding="4,0"
+                                CaretBrush="White"
+                                VerticalContentAlignment="Center"
+                                PasswordChanged="PasswordBox_PasswordChanged"/>
+                        </Grid>
+                    </Border>
+
+                    <Button
+                        x:Name="ConnectButton"
+                        Grid.Row="6"
+                        Height="44"
+                        Background="#2563EB"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="Connect_Click"
+                        Content="🔗  Connect"
+                        HorizontalContentAlignment="Center">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border
+                                    CornerRadius="22"
+                                    Background="{TemplateBinding Background}">
+                                    <ContentPresenter
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
