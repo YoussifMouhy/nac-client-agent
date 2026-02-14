@@ -15,6 +15,7 @@ namespace NAC.Client.UI
             InitializeComponent();
             this.nacService = nacService;
             PositionNearTray();
+            ConnectButton.IsDefault = true;
         }
 
         private void PositionNearTray()
@@ -23,7 +24,7 @@ namespace NAC.Client.UI
             Left = workArea.Right - Width - 12;
             Top = workArea.Bottom - Height - 12;
         }
-
+        
         private async void Connect_Click(object sender, RoutedEventArgs e)
         {
             var username = UsernameBox.Text?.Trim();

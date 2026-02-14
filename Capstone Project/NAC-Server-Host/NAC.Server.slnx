@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="NAC.Server.API/NAC.Server.API.csproj" />
+  <Project Path="NAC.Server.Core/NAC.Server.Core.csproj" />
+  <Project Path="NAC.Server.Services/NAC.Server.Services.csproj" />
+  <Project Path="NAC.Server.UI/NAC.Server.UI.csproj" />
+</Solution>

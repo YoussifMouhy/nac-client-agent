@@ -5,29 +5,38 @@ using System.Reflection;
 using System.Windows.Forms;
 using NAC.Client.Core.Interfaces;
 using NAC.Client.Core.Models;
-using NAC.Client.Core.Services;
+using NAC.Client.Core.Services; // Ensure this is here
 using NAC.Client.UI;
 
 namespace Tray
 {
     public sealed class TrayAppContext : ApplicationContext
     {
+        // 1. We keep the Interface (INacService) so the rest of the code doesn't break
         private readonly INacService nacService;
         private readonly NotifyIcon trayIcon;
 
         private readonly ToolStripMenuItem statusLabel;
         private readonly ToolStripMenuItem loginToggleItem;
-        
+
         private readonly Icon iconDisconnected;
         private readonly Icon iconConnected;
         private ToolStripMenuItem infoItem;
 
         public TrayAppContext()
         {
-            nacService = new MockNacService();
+            // ---------------------------------------------------------------
+            // ⚠️ CRITICAL CHANGE: SWAP MOCK FOR REAL HTTP SERVICE
+            // ---------------------------------------------------------------
+            // OLD: nacService = new MockNacService(); 
+
+            // NEW: Use the real service that talks to your Server IP
+            nacService = new HttpNacService();
+            // ---------------------------------------------------------------
 
             iconDisconnected = LoadIcon("disconnected.ico");
             iconConnected = LoadIcon("connected.ico");
+
 
             statusLabel = new ToolStripMenuItem("Status: Disconnected")
             {
@@ -41,6 +50,7 @@ namespace Tray
                 Font = new Font("Segoe UI", 9)
             };
             loginToggleItem.Click += OnLoginToggleClicked;
+
             infoItem = new ToolStripMenuItem("Connection Info")
             {
                 Font = new Font("Segoe UI", 9),
@@ -49,17 +59,19 @@ namespace Tray
 
             infoItem.Click += (_, _) =>
             {
-                if (nacService is MockNacService svc && svc.CurrentDeviceInfo != null)
+                // NOTE: HttpNacService also implements IsConnected and CurrentDeviceInfo
+                // so this logic works for both Mock and Real services.
+                if (nacService.IsConnected && ((HttpNacService)nacService).CurrentDeviceInfo != null)
                 {
-                    var d = svc.CurrentDeviceInfo;
+                    // We cast to HttpNacService or just access via Interface if you added the property to INacService
+                    // Assuming HttpNacService has the property 'CurrentDeviceInfo' public
+                    var deviceInfo = ((HttpNacService)nacService).CurrentDeviceInfo;
 
                     MessageBox.Show(
-                        $"Device Name: {d.DeviceName}\n" +
-                        $"OS: {d.OperatingSystem}\n" +
-                        $"IP Address: {d.IpAddress}\n" +
-                        $"MAC Address: {d.MacAddress}\n" +
-                        $"VPN Port: {d.VpnPort}\n" +
-                        $"Connected At: {d.ConnectedAt}",
+                        $"Device Name: {deviceInfo.DeviceName}\n" +
+                        $"OS: {deviceInfo.OperatingSystem}\n" +
+                        $"IP Address: {deviceInfo.IpAddress}\n" +
+                        $"Connected At: {deviceInfo.ConnectedAt}",
                         "Connection Information",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
@@ -86,6 +98,15 @@ namespace Tray
 
         private async void OnLoginToggleClicked(object? sender, EventArgs e)
         {
+            if (nacService.IsConnected)
+            {
+                // This calls the API logout endpoint now!
+                await nacService.LogoutAsync();
+                RefreshTrayUi();
+                return;
+            }
+
+            // We pass the REAL service to the login window here
             var loginWindow = new LoginWindow(nacService);
             bool? loginResult = loginWindow.ShowDialog();
 
@@ -95,10 +116,12 @@ namespace Tray
                 return;
             }
 
+            // PHASE 2: This now happens after the Server has already validated credentials
             var phase2Request = new Phase2ValidationRequest
             {
                 ClientVersion = "1.0.0",
-                DeviceInfo = DeviceInfoProvider.Collect(8080)
+                // Make sure DeviceInfoProvider is available in your project, or hardcode for testing
+                DeviceInfo = DeviceInfoProvider.Collect(5000)
             };
 
             var phase2Result = await nacService.ValidatePhase2Async(
@@ -127,6 +150,7 @@ namespace Tray
                 MessageBoxIcon.Information
             );
 
+            // Starts sending heartbeats to the Server
             await nacService.StartHeartbeatAsync(CancellationToken.None);
 
             trayIcon.ShowBalloonTip(
@@ -141,6 +165,12 @@ namespace Tray
 
         private void OnExitClicked(object? sender, EventArgs e)
         {
+            // Ensure we tell the server we are leaving
+            if (nacService.IsConnected)
+            {
+                nacService.LogoutAsync().Wait();
+            }
+
             trayIcon.Visible = false;
             trayIcon.Dispose();
             Application.Exit();
@@ -180,10 +210,6 @@ namespace Tray
 
             if (resourcePath == null)
             {
-                MessageBox.Show(
-                    $"Icon '{fileName}' not found.\n\nAvailable resources:\n{string.Join("\n", resources)}",
-                    "Icon Load Error"
-                );
                 return SystemIcons.Shield;
             }
 
@@ -195,6 +221,25 @@ namespace Tray
             catch
             {
                 return SystemIcons.Shield;
+            }
+        }
+        private string GetLocalIpAddress()
+        {
+            try
+            {
+                var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+                foreach (var ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        return ip.ToString();
+                    }
+                }
+                return "127.0.0.1";
+            }
+            catch
+            {
+                return "Unknown";
             }
         }
     }
