@@ -69,7 +69,6 @@ public partial class Program
             }
         });
 
-        //// Add this at the bottom of Main, before app.Run()
         //Task.Run(async () => {
         //    using var udpClient = new System.Net.Sockets.UdpClient();
         //    var endpoint = new System.Net.IPEndPoint(System.Net.IPAddress.Broadcast, 8888);
