@@ -1,6 +1,0 @@
-@NAC.Server.API_HostAddress = http://localhost:5216
-
-GET {{NAC.Server.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
